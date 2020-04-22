@@ -65,12 +65,13 @@ class MainActivity : AppCompatActivity() {
             }
 
             mainActivityViewModel.setNewBaseCurrencyValue(newValueDouble)
+            initOservers()
         }
     }
 
 
     private fun initOservers(){
-        mainActivityViewModel.currentBaseRatesLiveData().observe(this, Observer { currencyAdapterEntityList ->
+        mainActivityViewModel.currentBaseRatesLiveData.observe(this, Observer { currencyAdapterEntityList ->
             tvUpdatedAt.text = Date().toString()
             rvCurrencyList.adapter = CurrencyAdapter(
                 currencyAdapterEntityList.toMutableList(),

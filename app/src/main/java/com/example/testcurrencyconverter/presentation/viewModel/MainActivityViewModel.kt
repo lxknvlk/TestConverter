@@ -19,53 +19,44 @@ class MainActivityViewModel(application: Application): ViewModel() {
         DatabaseModule(application)
     ).build()
 
-    var baseCurrency: CurrencyType = CurrencyType.USD
     var baseCurrencyValue: Double = 1.0
 
-    fun currentBaseRatesLiveData(): LiveData<List<CurrencyAdapterEntity>> {
-        return Transformations.map(applicationGraph.currencyRepository().getRatesForBase(baseCurrency)){
-            buildCurrencyAdapterEntityList(it)
+    val baseCurrencyLiveData: MutableLiveData<CurrencyType> by lazy {
+        val mLiveCurrencyLiveData = MutableLiveData<CurrencyType>()
+        mLiveCurrencyLiveData.postValue(CurrencyType.USD)
+        mLiveCurrencyLiveData
+    }
+
+    val currentBaseRatesLiveData: LiveData<MutableList<CurrencyAdapterEntity>> by lazy {
+        Transformations.switchMap(baseCurrencyLiveData) { newBaseCurrency ->
+            Transformations.map(applicationGraph.currencyRepository().getRatesForBase(newBaseCurrency)){ currencyEntityList ->
+                val currencyAdapterEntityList = mutableListOf<CurrencyAdapterEntity>()
+                currencyAdapterEntityList.add(CurrencyAdapterEntity(newBaseCurrency, baseCurrencyValue))
+
+                currencyEntityList.forEach {
+                    currencyAdapterEntityList.add(CurrencyAdapterEntity(it.other, it.value * baseCurrencyValue))
+                }
+
+                currencyAdapterEntityList
+            }
         }
     }
 
-//    private fun refreshCurrencyElements(){
-//        GlobalScope.launch(Dispatchers.IO){
-//            val currencyEntityList = applicationGraph.currencyRepository().getRatesForBaseSync(baseCurrency)
-//            val currencyAdapterEntityList = buildCurrencyAdapterEntityList(currencyEntityList)
-//            currentBaseRatesLiveData.postValue(currencyAdapterEntityList)
-//        }
-//    }
-
-    private fun buildCurrencyAdapterEntityList(currencyEntityList: List<CurrencyEntity>): List<CurrencyAdapterEntity> {
-        val currencyAdapterEntityList = mutableListOf<CurrencyAdapterEntity>()
-        currencyAdapterEntityList.add(CurrencyAdapterEntity(baseCurrency, baseCurrencyValue))
-
-        currencyEntityList.forEach {
-            currencyAdapterEntityList.add(CurrencyAdapterEntity(it.other, it.value * baseCurrencyValue))
-        }
-
-        return currencyAdapterEntityList
-    }
 
     fun setNewBaseCurrency(currency: CurrencyType, value: Double){
         baseCurrencyValue = 1.0
-        baseCurrency = currency
-//        refreshCurrencyElements()
+        baseCurrencyLiveData.postValue(currency)
     }
 
     fun setNewBaseCurrencyValue(value: Double){
         baseCurrencyValue = value
-//        refreshCurrencyElements()
     }
 
     fun updateRates(){
         GlobalScope.launch(Dispatchers.IO) {
-//            applicationGraph.currencyRepository().updateRates()
-
             while (true){
                 applicationGraph.currencyRepository().updateRates()
-//                refreshCurrencyElements()
-                delay(5000)
+                delay(1000)
             }
         }
     }
