@@ -1,15 +1,15 @@
 package com.example.testcurrencyconverter.data.mapper
 
 import com.example.testcurrencyconverter.data.database.stringToCurrencyType
-import com.example.testcurrencyconverter.domain.entity.CurrencyEntity
+import com.example.testcurrencyconverter.domain.entity.ApiResponseEntity
 import com.example.testcurrencyconverter.domain.entity.CurrencyType
 import com.example.testcurrencyconverter.domain.mapper.Mapper
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.json.JSONObject
 
-class ApiResponseEntityMapper: Mapper<JSONObject, CurrencyEntity>() {
-    override fun mapFrom(from: JSONObject): CurrencyEntity {
+class ApiResponseEntityMapper: Mapper<JSONObject, ApiResponseEntity>() {
+    override fun mapFrom(from: JSONObject): ApiResponseEntity {
         val ratesObject = from.getJSONObject("rates")
         val base = from.getString("base")
 
@@ -17,7 +17,7 @@ class ApiResponseEntityMapper: Mapper<JSONObject, CurrencyEntity>() {
 
         val rates: Map<String, Double> = ObjectMapper().readValue(ratesObject.toString(), object :TypeReference<Map<String,Double>>(){})
 
-        return CurrencyEntity(baseType, rates)
+        return ApiResponseEntity(baseType, rates)
     }
 }
 

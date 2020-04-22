@@ -4,12 +4,13 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import com.example.testcurrencyconverter.domain.entity.CurrencyType
 
-@Entity(tableName = "currency",
-        primaryKeys = ["currency"])
+@Entity(tableName = "rates",
+        primaryKeys = ["base", "other"])
 data class CurrencyData(
-    @ColumnInfo(name = "rates")
-    val rates: Map<String, Double>,
-
-    @ColumnInfo(name = "currency")
-    val currency: CurrencyType
+    @ColumnInfo(name = "base")
+    val base: CurrencyType,
+    @ColumnInfo(name = "other")
+    val other: CurrencyType,
+    @ColumnInfo(name = "value")
+    val value: Double
 )

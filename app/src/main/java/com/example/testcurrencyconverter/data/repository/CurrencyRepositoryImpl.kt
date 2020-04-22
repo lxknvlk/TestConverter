@@ -2,10 +2,12 @@ package com.example.testcurrencyconverter.data.repository
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
+import androidx.lifecycle.map
 import com.example.testcurrencyconverter.data.database.CurrencyDao
 import com.example.testcurrencyconverter.data.mapper.CurrencyDataEntityMapper
 import com.example.testcurrencyconverter.data.mapper.CurrencyEntityDataMapper
 import com.example.testcurrencyconverter.data.servercall.ApiCallExecutorImpl
+import com.example.testcurrencyconverter.domain.entity.ApiResponseEntity
 import com.example.testcurrencyconverter.domain.entity.CurrencyEntity
 import com.example.testcurrencyconverter.domain.entity.CurrencyType
 import com.example.testcurrencyconverter.domain.repository.CurrencyRepository
@@ -22,7 +24,7 @@ class CurrencyRepositoryImpl @Inject constructor(
     private val apiCallExecutor: ApiCallExecutorImpl
 ): CurrencyRepository {
     override suspend fun updateRates() {
-        //TODO move this to provider + dagger
+        //TODO move this to provider
         val supportedCurrencies = listOf<CurrencyType>(
             CurrencyType.EUR,
             CurrencyType.USD,
@@ -30,11 +32,26 @@ class CurrencyRepositoryImpl @Inject constructor(
             CurrencyType.GBP
         )
 
-        supportedCurrencies.forEach {
-            // ALEX_Z: зачем вызов каждого значения внутри корутины? Memory leak
-            GlobalScope.launch(Dispatchers.IO){
-                val ratesEntity = apiCallExecutor.getRates(it)
-                if (ratesEntity != null) currencyDao.upsert(currencyEntityDataMapper.mapFrom(ratesEntity))
+        // ALEX_Z: зачем вызов каждого значения внутри корутины? Memory leak
+        // - fixed
+        GlobalScope.launch(Dispatchers.IO){
+            val currencyRatesList = mutableListOf<CurrencyEntity>()
+
+            supportedCurrencies.forEach { currencyType ->
+
+                val ratesEntity: ApiResponseEntity? = apiCallExecutor.getRates(currencyType)
+                ratesEntity?.let { currencyEntity ->
+                    supportedCurrencies.forEach {
+                        if (it != currencyEntity.currency){
+                            val value = currencyEntity.rates[it.toString()]?.toDouble() ?: 0.0
+                            currencyRatesList.add(CurrencyEntity(currencyEntity.currency, it, value))
+                        }
+                    }
+                }
+            }
+
+            currencyRatesList.forEach {
+                currencyDao.upsert(currencyEntityDataMapper.mapFrom(it))
             }
         }
     }
@@ -54,6 +71,16 @@ class CurrencyRepositoryImpl @Inject constructor(
 
         return currencyRateDataList.map {
             currencyDataEntityMapper.mapFrom(it)
+        }
+    }
+
+    override fun getRatesForBase(baseCurrency: CurrencyType): LiveData<List<CurrencyEntity>> {
+        return Transformations.map(currencyDao.getRatesForBase(baseCurrency.toString())){ currencyRateDataList ->
+            val currencyEntityList = currencyRateDataList.map {
+                currencyDataEntityMapper.mapFrom(it)
+            }
+
+            currencyEntityList
         }
     }
 }

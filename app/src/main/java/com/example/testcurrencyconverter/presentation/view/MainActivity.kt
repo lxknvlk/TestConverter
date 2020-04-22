@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
 
 
         initOservers()
-        mainActivityViewModel.updateRates()
+//        mainActivityViewModel.updateRates()
     }
 
     override fun onCreateView(name: String, context: Context, attrs: AttributeSet): View? {
@@ -57,45 +57,45 @@ class MainActivity : AppCompatActivity() {
     }
 
     private val textChangeListener = object: CurrencyAdapter.TextChangeListener {
-        override fun onTextChanged(item: CurrencyAdapterEntity, newValue: String, baseCurrency: BaseCurrencyEntity) {
-            val currencyAdapter: CurrencyAdapter = rvCurrencyList.adapter as CurrencyAdapter
-            // ALEX_Z: зачем копируется каждый элемент?
-            val currencyElements = ArrayList(currencyAdapter.getCurrencyList().map { it.copy() })
-
-            if (newValue.isEmpty()) return
-
-            val newValueDouble = try {
-                newValue.toDouble()
-            } catch (e: Exception) {
-                return
-            }
-
-            val skippedCurrency = if (item.currency == baseCurrency.currency){
-                baseCurrency.value = newValueDouble
-                baseCurrency.currency
-            } else {
-                // ALEX_Z:я не совсем уверен, что base currency самое подходящее имя для этого поля.
-                // Тут подразумевается, что BASE Currency делится на значение этой валюты (BASE) на
-                // rateToBASE, что по логике вещей должно быть всегда 1 (USD/USD = 1).
-                baseCurrency.value = newValueDouble / item.rateToBase
-                item.currency
-            }
-
-            currencyElements.forEach {
-                val isBaseCurrency = it.currency == baseCurrency.currency
-                val isSkippedCurrency = it.currency == skippedCurrency
-
-                if (!isSkippedCurrency){
-                    if (isBaseCurrency){
-                        it.value = baseCurrency.value
-                    } else {
-                        it.value = baseCurrency.value * it.rateToBase
-                    }
-
-                }
-            }
-
-            updateList(currencyElements)
+        override fun onTextChanged(item: CurrencyAdapterEntity, newValue: String) {
+//            val currencyAdapter: CurrencyAdapter = rvCurrencyList.adapter as CurrencyAdapter
+//            // ALEX_Z: зачем копируется каждый элемент?
+//            val currencyElements = ArrayList(currencyAdapter.getCurrencyList().map { it.copy() })
+//
+//            if (newValue.isEmpty()) return
+//
+//            val newValueDouble = try {
+//                newValue.toDouble()
+//            } catch (e: Exception) {
+//                return
+//            }
+//
+//            val skippedCurrency = if (item.currency == baseCurrency.currency){
+//                baseCurrency.value = newValueDouble
+//                baseCurrency.currency
+//            } else {
+//                // ALEX_Z:я не совсем уверен, что base currency самое подходящее имя для этого поля.
+//                // Тут подразумевается, что BASE Currency делится на значение этой валюты (BASE) на
+//                // rateToBASE, что по логике вещей должно быть всегда 1 (USD/USD = 1).
+//                baseCurrency.value = newValueDouble / item.rateToBase
+//                item.currency
+//            }
+//
+//            currencyElements.forEach {
+//                val isBaseCurrency = it.currency == baseCurrency.currency
+//                val isSkippedCurrency = it.currency == skippedCurrency
+//
+//                if (!isSkippedCurrency){
+//                    if (isBaseCurrency){
+//                        it.value = baseCurrency.value
+//                    } else {
+//                        it.value = baseCurrency.value * it.rateToBase
+//                    }
+//
+//                }
+//            }
+//
+//            updateList(currencyElements)
         }
     }
 
@@ -113,11 +113,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initOservers(){
-        mainActivityViewModel.ratesLiveData.observe(this, Observer { currencyDataObject ->
+        mainActivityViewModel.currentBaseRatesLiveData.observe(this, Observer { currencyAdapterEntityList ->
             tvUpdatedAt.text = Date().toString()
             rvCurrencyList.adapter = CurrencyAdapter(
-                currencyDataObject.currencyEntityList.toMutableList(),
-                currencyDataObject.currentBaseRate,
+                currencyAdapterEntityList.toMutableList(),
                 itemClickListener,
                 textChangeListener
             )
@@ -125,9 +124,9 @@ class MainActivity : AppCompatActivity() {
 
         // ALEX_Z: ViewModel сообщает Activity, что надо обратиться в ViewModel. Зачем нам лишний
         // посредник?
-        mainActivityViewModel.ratesUpdateLiveData.observe(this, Observer {
-            // ALEX_Z: почему value 1.0?
-            mainActivityViewModel.setCurrentBaseCurrency(BaseCurrencyEntity(CurrencyType.USD, 1.0))
-        })
+//        mainActivityViewModel.ratesUpdateLiveData.observe(this, Observer {
+//            // ALEX_Z: почему value 1.0?
+//            mainActivityViewModel.setCurrentBaseCurrency(BaseCurrencyEntity(CurrencyType.USD, 1.0))
+//        })
     }
 }

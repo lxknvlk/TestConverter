@@ -1,12 +1,9 @@
 package com.example.testcurrencyconverter.data.servercall
 
 import com.example.testcurrencyconverter.data.mapper.ApiResponseEntityMapper
-import com.example.testcurrencyconverter.domain.entity.CurrencyEntity
+import com.example.testcurrencyconverter.domain.entity.ApiResponseEntity
 import com.example.testcurrencyconverter.domain.entity.CurrencyType
-import com.example.testcurrencyconverter.domain.mapper.Mapper
 import com.example.testcurrencyconverter.domain.servercall.ApiCallExecutor
-import com.google.gson.Gson
-import com.google.gson.JsonObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.Call
@@ -23,7 +20,7 @@ class ApiCallExecutorImpl @Inject constructor(
     // ALEX_Z: можем ли заменить на Mapper<JSONObject, CurrencyEntity>?
     private val apiResponseEntityMapper: ApiResponseEntityMapper
 ): ApiCallExecutor {
-    override suspend fun getRates(baseCurrency: CurrencyType): CurrencyEntity? {
+    override suspend fun getRates(baseCurrency: CurrencyType): ApiResponseEntity? {
         // ALEX_Z: зачем обертка в Dispatchers.IO?
         return withContext(Dispatchers.IO){
             val request: Request = Request.Builder()

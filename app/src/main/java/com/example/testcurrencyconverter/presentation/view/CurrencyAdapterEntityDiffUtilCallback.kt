@@ -1,7 +1,6 @@
 package com.example.testcurrencyconverter.presentation.view
 
 import androidx.recyclerview.widget.DiffUtil
-import com.example.testcurrencyconverter.domain.entity.CurrencyEntity
 import com.example.testcurrencyconverter.presentation.entity.CurrencyAdapterEntity
 
 class CurrencyAdapterEntityDiffUtilCallback(
