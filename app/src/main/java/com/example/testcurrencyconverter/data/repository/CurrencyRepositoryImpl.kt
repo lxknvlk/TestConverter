@@ -16,6 +16,7 @@ import javax.inject.Inject
 
 class CurrencyRepositoryImpl @Inject constructor(
     private val currencyDao: CurrencyDao,
+    // ALEX_Z: почему передается конкретная реализация интерфейса для всех параметров?
     private val currencyEntityDataMapper: CurrencyEntityDataMapper,
     private val currencyDataEntityMapper: CurrencyDataEntityMapper,
     private val apiCallExecutor: ApiCallExecutorImpl
@@ -30,6 +31,7 @@ class CurrencyRepositoryImpl @Inject constructor(
         )
 
         supportedCurrencies.forEach {
+            // ALEX_Z: зачем вызов каждого значения внутри корутины? Memory leak
             GlobalScope.launch(Dispatchers.IO){
                 val ratesEntity = apiCallExecutor.getRates(it)
                 if (ratesEntity != null) currencyDao.upsert(currencyEntityDataMapper.mapFrom(ratesEntity))

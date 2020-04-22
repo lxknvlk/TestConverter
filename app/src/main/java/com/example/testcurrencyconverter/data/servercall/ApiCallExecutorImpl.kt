@@ -20,9 +20,11 @@ import javax.inject.Singleton
 @Singleton
 class ApiCallExecutorImpl @Inject constructor(
     private val OkHttpClient: OkHttpClient,
+    // ALEX_Z: можем ли заменить на Mapper<JSONObject, CurrencyEntity>?
     private val apiResponseEntityMapper: ApiResponseEntityMapper
 ): ApiCallExecutor {
     override suspend fun getRates(baseCurrency: CurrencyType): CurrencyEntity? {
+        // ALEX_Z: зачем обертка в Dispatchers.IO?
         return withContext(Dispatchers.IO){
             val request: Request = Request.Builder()
                 .url("https://api.exchangeratesapi.io/latest?base=$baseCurrency")

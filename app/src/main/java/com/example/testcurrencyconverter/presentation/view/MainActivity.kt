@@ -51,6 +51,7 @@ class MainActivity : AppCompatActivity() {
 
     private val itemClickListener = object: CurrencyAdapter.OnItemClickListener {
         override fun onItemClick(item: CurrencyAdapterEntity) {
+            // ALEX_Z: почему value = 1.0?
             mainActivityViewModel.setCurrentBaseCurrency(BaseCurrencyEntity(item.currency, 1.0))
         }
     }
@@ -58,6 +59,7 @@ class MainActivity : AppCompatActivity() {
     private val textChangeListener = object: CurrencyAdapter.TextChangeListener {
         override fun onTextChanged(item: CurrencyAdapterEntity, newValue: String, baseCurrency: BaseCurrencyEntity) {
             val currencyAdapter: CurrencyAdapter = rvCurrencyList.adapter as CurrencyAdapter
+            // ALEX_Z: зачем копируется каждый элемент?
             val currencyElements = ArrayList(currencyAdapter.getCurrencyList().map { it.copy() })
 
             if (newValue.isEmpty()) return
@@ -72,6 +74,9 @@ class MainActivity : AppCompatActivity() {
                 baseCurrency.value = newValueDouble
                 baseCurrency.currency
             } else {
+                // ALEX_Z:я не совсем уверен, что base currency самое подходящее имя для этого поля.
+                // Тут подразумевается, что BASE Currency делится на значение этой валюты (BASE) на
+                // rateToBASE, что по логике вещей должно быть всегда 1 (USD/USD = 1).
                 baseCurrency.value = newValueDouble / item.rateToBase
                 item.currency
             }
@@ -94,9 +99,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // ALEX_Z: тут случается полнейший рассинхрон со значениями в mainActivityViewModel.ratesLiveData
+    // В адаптаре будет одно значение, в mainActivityViewModel.ratesLiveData будет другое. У тебя
+    // должен быть ОДИН ИДИНСТВЕННЫЙ источник данных на экране, сейчас у тебя их 2. Как узнать какой
+    // из них верный на данный момент времени?
     private fun updateList(currencyElements: MutableList<CurrencyAdapterEntity>){
         val currencyAdapter: CurrencyAdapter = rvCurrencyList.adapter as CurrencyAdapter
         currencyAdapter.textChangeListenerDisabled = true
+
+        // ALEX_Z: зачем тут post вообще?
         rvCurrencyList.post { currencyAdapter.updateList(currencyElements) }
         rvCurrencyList.postDelayed({ currencyAdapter.textChangeListenerDisabled = false }, 100)
     }
@@ -112,7 +123,10 @@ class MainActivity : AppCompatActivity() {
             )
         })
 
+        // ALEX_Z: ViewModel сообщает Activity, что надо обратиться в ViewModel. Зачем нам лишний
+        // посредник?
         mainActivityViewModel.ratesUpdateLiveData.observe(this, Observer {
+            // ALEX_Z: почему value 1.0?
             mainActivityViewModel.setCurrentBaseCurrency(BaseCurrencyEntity(CurrencyType.USD, 1.0))
         })
     }

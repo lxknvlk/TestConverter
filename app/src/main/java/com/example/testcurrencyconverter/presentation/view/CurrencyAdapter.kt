@@ -35,6 +35,8 @@ class CurrencyAdapter(
         fun onTextChanged(item: CurrencyAdapterEntity, newValue: String, baseCurrency: BaseCurrencyEntity)
     }
 
+
+    // ALEX_Z: зачем нужен этот метод?
     fun getCurrencyList(): MutableList<CurrencyAdapterEntity>{
         return currencyList
     }

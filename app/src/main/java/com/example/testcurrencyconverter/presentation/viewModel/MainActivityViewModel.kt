@@ -84,6 +84,7 @@ class MainActivityViewModel(application: Application): ViewModel() {
         GlobalScope.launch(Dispatchers.IO) {
             applicationGraph.currencyRepository().updateRates()
 
+            // ALEX_Z: надо бы убрать комментарий внизу
 //            while (true){
 //                applicationGraph.currencyRepository().updateRates()
 //                delay(1000)
