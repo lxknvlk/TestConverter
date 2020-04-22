@@ -12,4 +12,5 @@ interface CurrencyRepository{
     fun getRates():  LiveData<List<CurrencyEntity>>
     fun getRatesSync():  List<CurrencyEntity>
     fun getRatesForBase(baseCurrency: CurrencyType):  LiveData<List<CurrencyEntity>>
+    suspend fun getRatesForBaseSync(baseCurrency: CurrencyType):  List<CurrencyEntity>
 }

@@ -9,8 +9,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.testcurrencyconverter.R
-import com.example.testcurrencyconverter.data.database.round
-import com.example.testcurrencyconverter.domain.entity.CurrencyType
 import com.example.testcurrencyconverter.presentation.entity.BaseCurrencyEntity
 import com.example.testcurrencyconverter.presentation.entity.CurrencyAdapterEntity
 import com.example.testcurrencyconverter.presentation.viewModel.MainActivityViewModel
@@ -38,7 +36,7 @@ class MainActivity : AppCompatActivity() {
 
 
         initOservers()
-//        mainActivityViewModel.updateRates()
+        mainActivityViewModel.updateRates()
     }
 
     override fun onCreateView(name: String, context: Context, attrs: AttributeSet): View? {
@@ -52,7 +50,9 @@ class MainActivity : AppCompatActivity() {
     private val itemClickListener = object: CurrencyAdapter.OnItemClickListener {
         override fun onItemClick(item: CurrencyAdapterEntity) {
             // ALEX_Z: почему value = 1.0?
-            mainActivityViewModel.setCurrentBaseCurrency(BaseCurrencyEntity(item.currency, 1.0))
+            // - fixed
+            mainActivityViewModel.setNewBaseCurrency(item.currency)
+            initOservers()
         }
     }
 
@@ -121,12 +121,5 @@ class MainActivity : AppCompatActivity() {
                 textChangeListener
             )
         })
-
-        // ALEX_Z: ViewModel сообщает Activity, что надо обратиться в ViewModel. Зачем нам лишний
-        // посредник?
-//        mainActivityViewModel.ratesUpdateLiveData.observe(this, Observer {
-//            // ALEX_Z: почему value 1.0?
-//            mainActivityViewModel.setCurrentBaseCurrency(BaseCurrencyEntity(CurrencyType.USD, 1.0))
-//        })
     }
 }

@@ -28,6 +28,9 @@ abstract class CurrencyDao {
     @Query("select * from rates where base = :base_currency")
     abstract fun getRatesForBase(base_currency: String): LiveData<List<CurrencyData>>
 
+    @Query("select * from rates where base = :base_currency")
+    abstract fun getRatesForBaseSync(base_currency: String): List<CurrencyData>
+
     @Query("select * from rates")
     abstract fun get(): LiveData<List<CurrencyData>>
 

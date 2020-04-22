@@ -35,11 +35,6 @@ class CurrencyAdapter(
     }
 
 
-    // ALEX_Z: зачем нужен этот метод?
-    fun getCurrencyList(): MutableList<CurrencyAdapterEntity>{
-        return currencyList
-    }
-
     class CurrencyViewHolder(view: View) : RecyclerView.ViewHolder(view){
         val tvCurrencyName: TextView = view.findViewById(R.id.tvCurrencyName)
         val etCurrencyAmount: EditText = view.findViewById(R.id.etCurrencyAmount)

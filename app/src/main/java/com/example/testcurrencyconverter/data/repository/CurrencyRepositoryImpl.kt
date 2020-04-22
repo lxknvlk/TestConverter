@@ -83,4 +83,10 @@ class CurrencyRepositoryImpl @Inject constructor(
             currencyEntityList
         }
     }
+
+    override suspend fun getRatesForBaseSync(baseCurrency: CurrencyType): List<CurrencyEntity> {
+        return currencyDao.getRatesForBaseSync(baseCurrency.toString()).map {
+            currencyDataEntityMapper.mapFrom(it)
+        }
+    }
 }
