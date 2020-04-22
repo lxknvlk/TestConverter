@@ -5,14 +5,12 @@ import androidx.lifecycle.*
 import com.example.testcurrencyconverter.data.dagger.ApplicationGraph
 import com.example.testcurrencyconverter.data.dagger.DaggerApplicationGraph
 import com.example.testcurrencyconverter.data.dagger.DatabaseModule
-import com.example.testcurrencyconverter.domain.entity.CurrencyDataObject
-import com.example.testcurrencyconverter.domain.entity.ApiResponseEntity
 import com.example.testcurrencyconverter.domain.entity.CurrencyEntity
 import com.example.testcurrencyconverter.domain.entity.CurrencyType
-import com.example.testcurrencyconverter.presentation.entity.BaseCurrencyEntity
 import com.example.testcurrencyconverter.presentation.entity.CurrencyAdapterEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class MainActivityViewModel(application: Application): ViewModel() {
@@ -24,24 +22,19 @@ class MainActivityViewModel(application: Application): ViewModel() {
     var baseCurrency: CurrencyType = CurrencyType.USD
     var baseCurrencyValue: Double = 1.0
 
-    val currentBaseRatesLiveData: MutableLiveData<List<CurrencyAdapterEntity>> by lazy {
-        val mRatesUpdateLiveData = MediatorLiveData<List<CurrencyAdapterEntity>>()
-
-        mRatesUpdateLiveData.addSource(applicationGraph.currencyRepository().getRatesForBase(baseCurrency)) { currencyEntityList ->
-            val currencyAdapterEntityList = buildCurrencyAdapterEntityList(currencyEntityList)
-            mRatesUpdateLiveData.postValue(currencyAdapterEntityList)
-        }
-
-        mRatesUpdateLiveData
-    }
-
-    fun refreshValues(){
-        GlobalScope.launch(Dispatchers.IO){
-            val currencyEntityList = applicationGraph.currencyRepository().getRatesForBaseSync(baseCurrency)
-            val currencyAdapterEntityList = buildCurrencyAdapterEntityList(currencyEntityList)
-            currentBaseRatesLiveData.postValue(currencyAdapterEntityList)
+    fun currentBaseRatesLiveData(): LiveData<List<CurrencyAdapterEntity>> {
+        return Transformations.map(applicationGraph.currencyRepository().getRatesForBase(baseCurrency)){
+            buildCurrencyAdapterEntityList(it)
         }
     }
+
+//    private fun refreshCurrencyElements(){
+//        GlobalScope.launch(Dispatchers.IO){
+//            val currencyEntityList = applicationGraph.currencyRepository().getRatesForBaseSync(baseCurrency)
+//            val currencyAdapterEntityList = buildCurrencyAdapterEntityList(currencyEntityList)
+//            currentBaseRatesLiveData.postValue(currencyAdapterEntityList)
+//        }
+//    }
 
     private fun buildCurrencyAdapterEntityList(currencyEntityList: List<CurrencyEntity>): List<CurrencyAdapterEntity> {
         val currencyAdapterEntityList = mutableListOf<CurrencyAdapterEntity>()
@@ -54,20 +47,26 @@ class MainActivityViewModel(application: Application): ViewModel() {
         return currencyAdapterEntityList
     }
 
-    fun setNewBaseCurrency(currency: CurrencyType){
+    fun setNewBaseCurrency(currency: CurrencyType, value: Double){
+        baseCurrencyValue = 1.0
         baseCurrency = currency
-        refreshValues()
+//        refreshCurrencyElements()
+    }
+
+    fun setNewBaseCurrencyValue(value: Double){
+        baseCurrencyValue = value
+//        refreshCurrencyElements()
     }
 
     fun updateRates(){
         GlobalScope.launch(Dispatchers.IO) {
-            applicationGraph.currencyRepository().updateRates()
+//            applicationGraph.currencyRepository().updateRates()
 
-            // ALEX_Z: надо бы убрать комментарий внизу
-//            while (true){
-//                applicationGraph.currencyRepository().updateRates()
-//                delay(1000)
-//            }
+            while (true){
+                applicationGraph.currencyRepository().updateRates()
+//                refreshCurrencyElements()
+                delay(5000)
+            }
         }
     }
 }
