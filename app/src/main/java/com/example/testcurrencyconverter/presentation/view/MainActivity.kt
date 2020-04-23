@@ -3,6 +3,7 @@ package com.example.testcurrencyconverter.presentation.view
 import android.content.Context
 import android.os.Bundle
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -49,6 +50,7 @@ class MainActivity : AppCompatActivity() {
 
     private val itemClickListener = object: CurrencyAdapter.OnItemClickListener {
         override fun onItemClick(item: CurrencyAdapterEntity) {
+            Log.i("logging", "setting new base currency ${item.currency}")
             mainActivityViewModel.setNewBaseCurrency(item.currency, 1.0)
         }
     }
@@ -64,6 +66,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             if (item.currency == mainActivityViewModel.baseCurrency) {
+                Log.i("logging", "setting new base currency ${item.currency}, with value $newValueDouble")
                 mainActivityViewModel.setNewBaseCurrency(item.currency, newValueDouble)
             }
         }
