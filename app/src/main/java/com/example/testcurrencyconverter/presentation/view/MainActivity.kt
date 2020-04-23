@@ -10,7 +10,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.testcurrencyconverter.R
-import com.example.testcurrencyconverter.presentation.entity.BaseCurrencyEntity
 import com.example.testcurrencyconverter.presentation.entity.CurrencyAdapterEntity
 import com.example.testcurrencyconverter.presentation.viewModel.MainActivityViewModel
 import com.example.testcurrencyconverter.presentation.viewModel.MainActivityViewModelFactory
@@ -51,7 +50,8 @@ class MainActivity : AppCompatActivity() {
     private val itemClickListener = object: CurrencyAdapter.OnItemClickListener {
         override fun onItemClick(item: CurrencyAdapterEntity) {
             Log.i("logging", "setting new base currency ${item.currency}")
-            mainActivityViewModel.setNewBaseCurrency(item.currency, 1.0)
+            item.value = 1.0
+            mainActivityViewModel.setNewBaseCurrency(item)
         }
     }
 
@@ -67,7 +67,8 @@ class MainActivity : AppCompatActivity() {
 
             if (item.currency == mainActivityViewModel.baseCurrency) {
                 Log.i("logging", "setting new base currency ${item.currency}, with value $newValueDouble")
-                mainActivityViewModel.setNewBaseCurrency(item.currency, newValueDouble)
+                item.value = newValueDouble
+                mainActivityViewModel.setNewBaseCurrency(item)
             }
         }
     }

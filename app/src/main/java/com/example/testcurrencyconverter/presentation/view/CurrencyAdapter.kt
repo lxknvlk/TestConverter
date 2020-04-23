@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.testcurrencyconverter.R
 import com.example.testcurrencyconverter.data.database.round
-import com.example.testcurrencyconverter.presentation.entity.BaseCurrencyEntity
 import com.example.testcurrencyconverter.presentation.entity.CurrencyAdapterEntity
 
 
