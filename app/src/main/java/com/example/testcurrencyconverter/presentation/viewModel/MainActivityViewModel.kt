@@ -22,8 +22,6 @@ class MainActivityViewModel(application: Application): ViewModel() {
     var baseCurrencyValue: Double = 1.0
     var baseCurrency: CurrencyType = CurrencyType.USD
 
-    var currencyList: MutableList<CurrencyAdapterEntity> = mutableListOf()
-
     val baseCurrencyLiveData: MutableLiveData<CurrencyType> by lazy {
         val mLiveCurrencyLiveData = MutableLiveData<CurrencyType>()
         mLiveCurrencyLiveData.postValue(CurrencyType.USD)
@@ -31,10 +29,10 @@ class MainActivityViewModel(application: Application): ViewModel() {
     }
 
     val currentBaseRatesLiveData: LiveData<MutableList<CurrencyAdapterEntity>> by lazy {
-        Transformations.switchMap(baseCurrencyLiveData) { newBaseCurrency ->
-            Transformations.map(applicationGraph.currencyRepository().getRatesForBase(newBaseCurrency)){ currencyEntityList ->
+        Transformations.switchMap(baseCurrencyLiveData) { _ ->
+            Transformations.map(applicationGraph.currencyRepository().getRatesForBase(baseCurrency)){ currencyEntityList ->
                 val currencyAdapterEntityList = mutableListOf<CurrencyAdapterEntity>()
-                currencyAdapterEntityList.add(CurrencyAdapterEntity(newBaseCurrency, baseCurrencyValue))
+                currencyAdapterEntityList.add(CurrencyAdapterEntity(baseCurrency, baseCurrencyValue))
 
                 currencyEntityList.forEach {
                     currencyAdapterEntityList.add(CurrencyAdapterEntity(it.other, it.value * baseCurrencyValue))
@@ -47,21 +45,19 @@ class MainActivityViewModel(application: Application): ViewModel() {
 
 
     fun setNewBaseCurrency(currency: CurrencyType, value: Double){
-        baseCurrencyValue = 1.0
+        baseCurrencyValue = value
         baseCurrency = currency
         baseCurrencyLiveData.postValue(currency)
     }
 
-    fun setNewBaseCurrencyValue(value: Double){
-        baseCurrencyValue = value
-    }
-
     fun updateRates(){
         GlobalScope.launch(Dispatchers.IO) {
-            while (true){
-                applicationGraph.currencyRepository().updateRates()
-                delay(1000)
-            }
+            applicationGraph.currencyRepository().updateRates()
+
+//            while (true){
+//                applicationGraph.currencyRepository().updateRates()
+//                delay(1000)
+//            }
         }
     }
 }

@@ -49,8 +49,7 @@ class MainActivity : AppCompatActivity() {
 
     private val itemClickListener = object: CurrencyAdapter.OnItemClickListener {
         override fun onItemClick(item: CurrencyAdapterEntity) {
-            mainActivityViewModel.setNewBaseCurrency(item.currency, item.value)
-            initOservers()
+            mainActivityViewModel.setNewBaseCurrency(item.currency, 1.0)
         }
     }
 
@@ -65,8 +64,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             if (item.currency == mainActivityViewModel.baseCurrency) {
-                mainActivityViewModel.setNewBaseCurrencyValue(newValueDouble)
-                initOservers()
+                mainActivityViewModel.setNewBaseCurrency(item.currency, newValueDouble)
             }
         }
     }
@@ -74,7 +72,6 @@ class MainActivity : AppCompatActivity() {
     private fun initOservers(){
         mainActivityViewModel.currentBaseRatesLiveData.observe(this, Observer { currencyAdapterEntityList ->
             tvUpdatedAt.text = Date().toString()
-
             updateList(currencyAdapterEntityList)
         })
     }

@@ -24,8 +24,6 @@ class CurrencyAdapter(
     private val textChangeListener: TextChangeListener
 ): RecyclerView.Adapter<CurrencyAdapter.CurrencyViewHolder>() {
 
-    var textChangeListenerDisabled = false
-
     interface OnItemClickListener {
         fun onItemClick(item: CurrencyAdapterEntity)
     }
@@ -53,7 +51,6 @@ class CurrencyAdapter(
 
         holder.etCurrencyAmount.addTextChangedListener(object: TextWatcher{
             override fun afterTextChanged(s: Editable?) {
-                if (textChangeListenerDisabled) return
                 textChangeListener.onTextChanged(currencyEntity, s.toString())
             }
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
