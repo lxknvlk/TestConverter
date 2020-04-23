@@ -81,15 +81,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateList(currencyAdapterEntityList: MutableList<CurrencyAdapterEntity>) {
-        if (rvCurrencyList.adapter == null){
+        val adapter = rvCurrencyList.adapter as CurrencyAdapter?
+        if (adapter == null){
             rvCurrencyList.adapter = CurrencyAdapter(
                 currencyAdapterEntityList.toMutableList(),
-                itemClickListener,
-                textChangeListener
+                itemClickListener
             )
         } else {
-            val adapter: CurrencyAdapter = rvCurrencyList.adapter as CurrencyAdapter
+            adapter.textChangeListener = null
             adapter.updateList(currencyAdapterEntityList)
         }
+
+        adapter?.textChangeListener = textChangeListener
     }
 }

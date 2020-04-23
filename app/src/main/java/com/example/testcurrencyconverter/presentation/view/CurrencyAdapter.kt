@@ -19,8 +19,7 @@ private const val LAYOUT_ID = R.layout.currency_adapter_item
 
 class CurrencyAdapter(
     private val currencyList: MutableList<CurrencyAdapterEntity>,
-    private val itemClickListener: OnItemClickListener,
-    private val textChangeListener: TextChangeListener
+    private val itemClickListener: OnItemClickListener
 ): RecyclerView.Adapter<CurrencyAdapter.CurrencyViewHolder>() {
 
     interface OnItemClickListener {
@@ -31,6 +30,7 @@ class CurrencyAdapter(
         fun onTextChanged(item: CurrencyAdapterEntity, newValue: String)
     }
 
+    public var textChangeListener: TextChangeListener? = null
 
     class CurrencyViewHolder(view: View) : RecyclerView.ViewHolder(view){
         val tvCurrencyName: TextView = view.findViewById(R.id.tvCurrencyName)
@@ -50,7 +50,7 @@ class CurrencyAdapter(
 
         holder.etCurrencyAmount.addTextChangedListener(object: TextWatcher{
             override fun afterTextChanged(s: Editable?) {
-                textChangeListener.onTextChanged(currencyEntity, s.toString())
+                textChangeListener?.onTextChanged(currencyEntity, s.toString())
             }
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}

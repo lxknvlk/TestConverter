@@ -18,11 +18,13 @@ import javax.inject.Singleton
 class ApiCallExecutorImpl @Inject constructor(
     private val OkHttpClient: OkHttpClient,
     // ALEX_Z: можем ли заменить на Mapper<JSONObject, CurrencyEntity>?
+    //should work with dagger
     private val apiResponseEntityMapper: ApiResponseEntityMapper
 ): ApiCallExecutor {
     override suspend fun getRates(baseCurrency: CurrencyType): ApiResponseEntity? {
         // ALEX_Z: зачем обертка в Dispatchers.IO?
-        return withContext(Dispatchers.IO){
+        //fix this
+        val res = withContext(Dispatchers.IO){
             val request: Request = Request.Builder()
                 .url("https://api.exchangeratesapi.io/latest?base=$baseCurrency")
                 .build()
@@ -39,5 +41,7 @@ class ApiCallExecutorImpl @Inject constructor(
 
             null
         }
+
+        return res
     }
 }

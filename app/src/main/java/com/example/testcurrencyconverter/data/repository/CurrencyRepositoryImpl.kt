@@ -19,6 +19,7 @@ import javax.inject.Inject
 class CurrencyRepositoryImpl @Inject constructor(
     private val currencyDao: CurrencyDao,
     // ALEX_Z: почему передается конкретная реализация интерфейса для всех параметров?
+    //should be possible with dagger and interface
     private val currencyEntityDataMapper: CurrencyEntityDataMapper,
     private val currencyDataEntityMapper: CurrencyDataEntityMapper,
     private val apiCallExecutor: ApiCallExecutorImpl
@@ -32,27 +33,23 @@ class CurrencyRepositoryImpl @Inject constructor(
             CurrencyType.GBP
         )
 
-        // ALEX_Z: зачем вызов каждого значения внутри корутины? Memory leak
-        // - fixed
-        GlobalScope.launch(Dispatchers.IO){
-            val currencyRatesList = mutableListOf<CurrencyEntity>()
+        val currencyRatesList = mutableListOf<CurrencyEntity>()
 
-            supportedCurrencies.forEach { currencyType ->
+        supportedCurrencies.forEach { currencyType ->
 
-                val ratesEntity: ApiResponseEntity? = apiCallExecutor.getRates(currencyType)
-                ratesEntity?.let { currencyEntity ->
-                    supportedCurrencies.forEach {
-                        if (it != currencyEntity.currency){
-                            val value = currencyEntity.rates[it.toString()]?.toDouble() ?: 0.0
-                            currencyRatesList.add(CurrencyEntity(currencyEntity.currency, it, value))
-                        }
+            val ratesEntity: ApiResponseEntity? = apiCallExecutor.getRates(currencyType)
+            ratesEntity?.let { currencyEntity ->
+                supportedCurrencies.forEach {
+                    if (it != currencyEntity.currency){
+                        val value = currencyEntity.rates[it.toString()]?.toDouble() ?: 0.0
+                        currencyRatesList.add(CurrencyEntity(currencyEntity.currency, it, value))
                     }
                 }
             }
+        }
 
-            currencyRatesList.forEach {
-                currencyDao.upsert(currencyEntityDataMapper.mapFrom(it))
-            }
+        currencyRatesList.forEach {
+            currencyDao.upsert(currencyEntityDataMapper.mapFrom(it))
         }
     }
 
