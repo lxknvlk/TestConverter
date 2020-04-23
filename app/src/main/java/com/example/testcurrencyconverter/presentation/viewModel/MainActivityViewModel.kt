@@ -20,6 +20,9 @@ class MainActivityViewModel(application: Application): ViewModel() {
     ).build()
 
     var baseCurrencyValue: Double = 1.0
+    var baseCurrency: CurrencyType = CurrencyType.USD
+
+    var currencyList: MutableList<CurrencyAdapterEntity> = mutableListOf()
 
     val baseCurrencyLiveData: MutableLiveData<CurrencyType> by lazy {
         val mLiveCurrencyLiveData = MutableLiveData<CurrencyType>()
@@ -45,6 +48,7 @@ class MainActivityViewModel(application: Application): ViewModel() {
 
     fun setNewBaseCurrency(currency: CurrencyType, value: Double){
         baseCurrencyValue = 1.0
+        baseCurrency = currency
         baseCurrencyLiveData.postValue(currency)
     }
 

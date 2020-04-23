@@ -12,16 +12,13 @@ class CurrencyAdapterEntityDiffUtilCallback(
         val oldItem = oldList[oldItemPosition]
         val newItem = newList[newItemPosition]
 
-        val oldBase = oldItem.currency
-        val newBase = newItem.currency
-
-        return oldBase == newBase
+        return oldItem.currency == newItem.currency
     }
 
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
         val oldItem = oldList[oldItemPosition]
         val newItem = newList[newItemPosition]
-        return oldItem.value == newItem.value
+        return oldItem.value == newItem.value && oldItem.currency == newItem.currency
     }
 }
 

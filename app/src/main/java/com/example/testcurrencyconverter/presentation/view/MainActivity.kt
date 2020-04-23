@@ -64,20 +64,31 @@ class MainActivity : AppCompatActivity() {
                 return
             }
 
-            mainActivityViewModel.setNewBaseCurrencyValue(newValueDouble)
-            initOservers()
+            if (item.currency == mainActivityViewModel.baseCurrency) {
+                mainActivityViewModel.setNewBaseCurrencyValue(newValueDouble)
+                initOservers()
+            }
         }
     }
-
 
     private fun initOservers(){
         mainActivityViewModel.currentBaseRatesLiveData.observe(this, Observer { currencyAdapterEntityList ->
             tvUpdatedAt.text = Date().toString()
+
+            updateList(currencyAdapterEntityList)
+        })
+    }
+
+    private fun updateList(currencyAdapterEntityList: MutableList<CurrencyAdapterEntity>) {
+        if (rvCurrencyList.adapter == null){
             rvCurrencyList.adapter = CurrencyAdapter(
                 currencyAdapterEntityList.toMutableList(),
                 itemClickListener,
                 textChangeListener
             )
-        })
+        } else {
+            val adapter: CurrencyAdapter = rvCurrencyList.adapter as CurrencyAdapter
+            adapter.updateList(currencyAdapterEntityList)
+        }
     }
 }
